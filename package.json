@@ -1,7 +1,7 @@
 {
   "name": "@invition/rxjs-sharelatest",
   "version": "1.0.0",
-  "description": "RxJS operator that help reduce invoking the source and fast 1st response",
+  "description": "An RxJS operator designed to limit source invocation and guarantee a swift initial response",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
