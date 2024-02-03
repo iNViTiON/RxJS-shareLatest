@@ -15,8 +15,9 @@
     "customizations": {
       "vscode": {
         "extensions": [
-          "arcanis.vscode-zipfs",
-          "biomejs.biome"
+            "arcanis.vscode-zipfs",
+            "biomejs.biome",
+            "github.vscode-github-actions"
         ]
       }
     }

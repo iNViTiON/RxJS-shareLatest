@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "arcanis.vscode-zipfs",
-    "biomejs.biome"
+    "biomejs.biome",
+    "github.vscode-github-actions"
   ]
 }
