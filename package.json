@@ -1,0 +1,27 @@
+{
+  "name": "rxjs-sharelatest",
+  "version": "1.0.0",
+  "description": "RxJS operator that help reduce invoking the source and fast 1st response",
+  "main": "index.js",
+  "scripts": {
+    "sdks": "yarn dlx @yarnpkg/sdks vscode",
+    "test": "dummy test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iNViTiON/RxJS-shareLatest.git"
+  },
+  "keywords": [
+    "RxJS"
+  ],
+  "author": "iNViTiON",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/iNViTiON/RxJS-shareLatest/issues"
+  },
+  "homepage": "https://github.com/iNViTiON/RxJS-shareLatest#readme",
+  "volta": {
+    "node": "20.11.0",
+    "yarn": "4.1.0"
+  }
+}
