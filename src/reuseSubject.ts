@@ -25,7 +25,7 @@ export class ReuseSubject<T> extends ReplaySubject<T> {
     this['_buffer'] = __buffer;
   }
 
-  public getBuffer(): (T | number)[] {
-    return (this['_buffer'] as (T | number)[]).slice();
-  }
+  public getBuffer = (): (T | number)[] => (this['_buffer'] as (T | number)[]).slice();
+
+  public resetBuffer = (): void => void (this['_buffer'].length = 0);
 }
