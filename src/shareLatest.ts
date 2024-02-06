@@ -1,19 +1,20 @@
-import type { MonoTypeOperatorFunction, Observable } from 'rxjs';
-import { EMPTY, asapScheduler, ignoreElements, observeOn, share, takeUntil, tap, timer } from 'rxjs';
+import type { BehaviorSubject, MonoTypeOperatorFunction, Observable } from 'rxjs';
+import { EMPTY, asapScheduler, filter, ignoreElements, observeOn, share, takeUntil, tap, timer } from 'rxjs';
 import { ReuseSubject } from './reuseSubject';
 
-export function shareLatest<T>(bufferLifetime?: number, bufferReset?: Observable<unknown>): MonoTypeOperatorFunction<T> {
+export function shareLatest<T>(bufferLifetime?: number, bufferReset?: BehaviorSubject<boolean>): MonoTypeOperatorFunction<T> {
   let previousBuffer: (number | T)[]
   let subject: ReuseSubject<T>;
-  const connector = (): ReuseSubject<T> => subject = new ReuseSubject<T>(previousBuffer, bufferLifetime);
+  const connector = (): ReuseSubject<T> => subject = new ReuseSubject<T>((bufferReset?.value && (previousBuffer.length = 0), previousBuffer), bufferLifetime);
   return (source$: Observable<T>) =>
     source$.pipe(
       observeOn(asapScheduler),
-      takeUntil(bufferReset?.pipe(
-        // Reset the buffer when the lifetime observable emits.
-        tap(() => subject.resetBuffer()),
-        // Ignore all emissions from the lifetime observable to prevent it from completing the source.
-        // This make takeUntil sit here as a noop but just manage subscriber for bufferLifetimeObs.
+      takeUntil(bufferReset?.asObservable().pipe(
+        filter(reset => reset),
+        // Reset the buffer when the reset observable emits `true`.
+        tap(() => (bufferReset.next(false), subject.resetBuffer())),
+        // Ignore all emissions from the reset observable to prevent it from completing the source.
+        // This make takeUntil sit here as a noop but just manage subscriber for reset observable.
         ignoreElements(),
       ) ?? EMPTY),
       share({

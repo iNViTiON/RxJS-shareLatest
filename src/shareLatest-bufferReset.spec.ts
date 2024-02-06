@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
-import { firstValueFrom, map, Observable, of, pipe, Subject, Subscription, tap, timeout, timer } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, map, Observable, of, pipe, Subject, Subscription, tap, timeout, timer } from 'rxjs';
 import { shareLatest } from './shareLatest';
 
 describe('RxJS shareLatest operator with bufferLifetime', () => {
@@ -9,18 +9,18 @@ describe('RxJS shareLatest operator with bufferLifetime', () => {
   let randomNumber: number;
   let observable: Observable<number>;
   let subscription: Subscription;
-  let bufferReset: Subject<void>;
+  let bufferReset: BehaviorSubject<boolean>;
 
   beforeEach(() => {
     count = 0;
     value = undefined;
     randomNumber = Math.random() * 1000;
     subject = new Subject();
-    bufferReset = new Subject();
+    bufferReset = new BehaviorSubject(false);
     observable = subject.pipe(
       tap(() => ++count),
       map(v => v * 2),
-      shareLatest(undefined, bufferReset.asObservable()),
+      shareLatest(undefined, bufferReset),
     );
     subscription = observable.subscribe(newValue => (value = newValue));
   });
@@ -44,9 +44,28 @@ describe('RxJS shareLatest operator with bufferLifetime', () => {
     expect(value2).toBe(randomNumber * 2);
 
     // reset buffer
-    bufferReset.next();
+    bufferReset.next(true);
     value2 = await firstValueFrom(observable.pipe(timeoutWithMagic));
     expect(count).toBe(1);
     expect(value2).toBe(InvSqrtMagic);
+
+    // buffer should reset just one time
+    subject.next(randomNumber);
+    value2 = await firstValueFrom(observable.pipe(timeoutWithMagic));
+    expect(count).toBe(2);
+    expect(value2).toBe(randomNumber * 2);
+    value2 = await firstValueFrom(observable.pipe(timeoutWithMagic));
+    expect(count).toBe(2);
+    expect(value2).toBe(randomNumber * 2);
+    await firstValueFrom(timer(0));
+    bufferReset.next(true);
+    await firstValueFrom(timer(0));
+    value2 = await firstValueFrom(observable.pipe(timeoutWithMagic));
+    expect(count).toBe(2);
+    expect(value2).toBe(InvSqrtMagic);
+    subject.next(randomNumber);
+    value2 = await firstValueFrom(observable.pipe(timeoutWithMagic));
+    expect(count).toBe(3);
+    expect(value2).toBe(randomNumber * 2);
   });
 });
